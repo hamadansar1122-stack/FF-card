@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Fire Tactical Card Studio</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #07080c; color: #e1e3ed; padding: 12px; display: flex; flex-direction: column; align-items: center; }
         
         .header { text-align: center; margin-bottom: 12px; }
@@ -97,12 +97,11 @@
         const canvas = document.getElementById('cardCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Dynamic Tier Pricing for 20 Templates
         const templatePrices = [
-            0, 0, 0, 0, 0,            // T1 - T5 : FREE (Noob / Simple Box)
-            60, 80, 100, 120, 150,     // T6 - T10 : Standard PRO Cutouts
-            180, 220, 250, 300, 350,   // T11 - T15 : Youtuber & Headshot Cutouts
-            400, 450, 500, 600, 750    // T16 - T20 : Ultra Tactical Cyber Cutouts
+            0, 0, 0, 0, 0,            // T1 - T5 : FREE (Noob)
+            60, 80, 100, 120, 150,     // T6 - T10 : PRO Cutouts
+            180, 220, 250, 300, 350,   // T11 - T15 : Youtuber Tiers
+            400, 450, 500, 600, 750    // T16 - T20 : Ultra Tactical
         ];
 
         let selectedTemplate = { id: 1, isPaid: false, price: 0 };
@@ -112,7 +111,7 @@
         const EP_NUM = "03160476040";
         const JC_NUM = "03241416116";
 
-        // Generate 20 Grid Items
+        // Build 20 Templates Grid
         const gridContainer = document.getElementById('tplGrid');
         for (let i = 1; i <= 20; i++) {
             const priceVal = templatePrices[i - 1];
@@ -164,14 +163,13 @@
             drawCard();
         }
 
-        // HTTPS Safe & CORS Enabled Image Loader
+        // Safe Image Loader
         function loadImg(event, type) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = new Image();
-                    img.crossOrigin = "Anonymous"; // Canvas Taint Fix for HTTPS
                     img.onload = function() {
                         if (type === 'char') charImg = img;
                         if (type === 'rank') rankImg = img;
@@ -183,7 +181,7 @@
             }
         }
 
-        // Draw Unique Cut-Out Shapes
+        // Tactical Cut-out Shapes Canvas Drawer
         function drawCardShapeAndBorder(id) {
             const w = canvas.width;
             const h = canvas.height;
@@ -192,7 +190,7 @@
             ctx.beginPath();
 
             if (id <= 5) {
-                // FREE / NOOB: Simple Plain Square Box
+                // Free / Noob: Box Shape
                 ctx.rect(10, 10, w - 20, h - 20);
                 ctx.fillStyle = '#0c0e17';
                 ctx.fill();
@@ -200,33 +198,29 @@
                 ctx.lineWidth = 3;
                 ctx.stroke();
             } else {
-                // PRO / ULTRA: Aggressive Cut-Out Angular Lines & Shapes
-                let cut = 20 + (id * 2); // Dynamic cut-angle length per template
+                // Pro: Cut-out Shapes
+                let cut = 15 + (id * 2);
                 
-                // Cut-Out Polygon Path
                 ctx.moveTo(10 + cut, 10);
                 ctx.lineTo(w - (10 + cut), 10);
                 ctx.lineTo(w - 10, 10 + cut);
                 ctx.lineTo(w - 10, h - (10 + cut));
                 ctx.lineTo(w - (10 + cut), h - 10);
                 ctx.lineTo(w/2 + 40, h - 10);
-                ctx.lineTo(w/2, h - 25); // Inward Bottom Grip Cut
+                ctx.lineTo(w/2, h - 25);
                 ctx.lineTo(w/2 - 40, h - 10);
                 ctx.lineTo(10 + cut, h - 10);
                 ctx.lineTo(10, h - (10 + cut));
                 ctx.lineTo(10, 10 + cut);
                 ctx.closePath();
 
-                // Dark Cyber Background Fill
                 ctx.fillStyle = '#070912';
                 ctx.fill();
 
-                // Dynamic Cut Border Color per PRO Tier
                 ctx.strokeStyle = (id > 15) ? '#ff0055' : ((id > 10) ? '#ffaa00' : '#00e5ff');
                 ctx.lineWidth = 5;
                 ctx.stroke();
 
-                // Outer Cut Notch Line Details
                 ctx.fillStyle = ctx.strokeStyle;
                 ctx.fillRect(w - (15 + cut), 6, 25, 6);
                 ctx.fillRect(15 + cut - 25, h - 12, 25, 6);
@@ -236,33 +230,32 @@
         }
 
         function drawCard() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Background Canvas Fill
+            ctx.fillStyle = "#07080c";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Draw Outer Shape
+            // 1. Draw Outer Frame
             drawCardShapeAndBorder(selectedTemplate.id);
 
-            // 2. High-Quality Overlay Details
+            // 2. High-Level Art / Details
             ctx.save();
             ctx.font = '900 13px Arial';
             ctx.textAlign = 'right';
 
             if (selectedTemplate.id <= 5) {
-                // Noob Theme Text
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
                 ctx.fillText("BASIC NOOB SURVIVOR", canvas.width - 25, 35);
             } else {
-                // Pro High-Level Art
-                ctx.fillStyle = 'rgba(255, 170, 0, 0.2)';
+                ctx.fillStyle = 'rgba(255, 170, 0, 0.3)';
                 ctx.fillText("★ PRO YOUTUBER EDITION ★", canvas.width - 25, 35);
                 
-                // Headshot Red Number Art
                 ctx.fillStyle = '#ff0033';
                 ctx.font = '900 20px Arial';
-                ctx.fillText("☠ 999 RED HEADSHOT", canvas.width - 25, 60);
+                ctx.fillText("☠ 999 RED HEADSHOT", canvas.width - 25, 65);
             }
             ctx.restore();
 
-            // 3. Character Image Box
+            // 3. Character Upload Slot
             ctx.fillStyle = '#05070c';
             ctx.fillRect(30, 30, 200, 290);
             ctx.strokeStyle = '#282d45';
@@ -279,7 +272,7 @@
                 ctx.fillText('(Upload Image)', 130, 190);
             }
 
-            // 4. Player Name and UID Input
+            // 4. Player Details
             const ign = document.getElementById('ign').value || 'SURVIVOR';
             const uid = document.getElementById('uid').value || '0000000000';
 
@@ -295,7 +288,7 @@
             ctx.font = 'bold 15px Arial';
             ctx.fillText('UID: ' + uid, 255, 145);
 
-            // Rank Badge Slot
+            // Rank Badge
             ctx.fillStyle = '#8f96b3';
             ctx.font = 'bold 11px Arial';
             ctx.fillText('RANK BADGE:', 255, 200);
@@ -313,6 +306,7 @@
             }
         }
 
+        // Render Immediately
         drawCard();
 
         function handleDownload() {
